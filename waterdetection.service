@@ -1,0 +1,15 @@
+[Unit]
+Description=Water Detection Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u /home/pi/code/WaterDetection/main.py
+WorkingDirectory=/home/pi/code/WaterDetection
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=30
+User=pi
+
+[Install]
+WantedBy=mulit-user.target
