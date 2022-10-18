@@ -1,5 +1,7 @@
-# using SendGrid's Python Library
-# https://github.com/sendgrid/sendgrid-python
+"""
+A most-basic use of the SendGrid email-sending APIs (using their Python module) to sent water-notifications
+See this page for more-and-better use of the `sendgrid` module: https://github.com/sendgrid/sendgrid-python
+"""
 
 import datetime
 import os
@@ -13,11 +15,6 @@ from_email = os.environ['WATER_FROM_EMAIL']
 to_email = os.environ['WATER_TO_EMAIL']
 last_send_filename = '/tmp/last_sent_email.txt'
 debounce_in_seconds = 300  # 5 minutes
-
-# Initial setup of GPIO so that GPIO.input() will work
-GPIO.setmode(GPIO.BOARD)
-GPIO.setwarnings(False)
-GPIO.setup(int(os.environ['pin']), GPIO.IN)
 
 
 def send_email_message(incoming_pin): 
@@ -37,14 +34,19 @@ def send_email_message(incoming_pin):
 		last_run = int(handle.read())
 
 	if last_run + debounce_in_seconds > now:
-		print(f"Logging Email Message: Not sending message as one was already sent {now - last_run} seconds ago. Must wait at least {debounce_in_seconds}.")
+		print(
+			f"Logging Email Message: Not sending message as one was already sent {now - last_run} seconds ago. Must wait "
+			f"at least {debounce_in_seconds} seconds."
+		)
 		return
 
 	message = Mail(
 		from_email=from_email,
 		to_emails=to_email,
 		subject='There is water in your house!!',
-		html_content=f'<strong>There is water in your house at location {incoming_pin}</strong>')
+		html_content=f'<strong>There is water in your house at location {incoming_pin}</strong>'
+	)
+
 	try:
 		sg = SendGridAPIClient(sendgrid_api_key)
 		response = sg.send(message)
@@ -55,6 +57,11 @@ def send_email_message(incoming_pin):
 	except Exception as e:
 		print(f"Logging Email Message: FAILURE - {e}")
 
-	with open(last_send_filename, 'w') as handle:
-		handle.write(str(now))
-
+	try:
+		with open(last_send_filename, 'w') as handle:
+			handle.write(str(now))
+	except Exception as e:
+		print(
+			f"Failure to write to Email Notification log file ({last_send_filename}): "
+			f"FAILURE - {e}"
+		)
