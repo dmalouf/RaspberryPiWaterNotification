@@ -5,7 +5,7 @@ from alt_msg import AltMessage
 from send_email_notification import send_email_message
 from send_sms_notification import send_sms_message
 
-pin = int(os.environ['pin'])  # Setting `pin` for ease-of-use below 
+pin = int(os.environ['WATER_PIN'])  # Setting `pin` for ease-of-use below - assumes value exists in the runtimes environment (`export`, .env file, etc.)
 os.environ['on_value'] = "0"  # Set this for YOUR setup!!
 
 
